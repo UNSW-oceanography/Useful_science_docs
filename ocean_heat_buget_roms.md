@@ -21,6 +21,9 @@ This document aims to provide useful information about the heat budget in ROMS a
 ## Introduction
 The Ocean Heat Budget (OHB) is a usefull approach to provide information about the ocean heat drivers. It is meant to give you an accurate decomposition of the terms controlling the temperature change over time in a specific area. 
 
+<br>
+<br>
+
 ## The heat budget equation
 
 By design, the ROMS model satisfy the heat conservation equation at every grid poing. The time evolution of temperature in the ocean is given by the sum of net heat exchange with the atmosphere, divergence of advective heat transport by horizontal and vertical velocities, and three-dimensional diffusive processes:
@@ -30,16 +33,20 @@ $$
 $$
 
 
+<br>
+<br>
+
 ## The ROMS diagnostic and average outputs
 To obtain the OHB terms in ROMS you must use the diagnostic output. This output provides you all the necessary terms to close the heat budget.
-In terms of ROMS diagnostic outputs, this equation is in the following format:
+In terms of ROMS diagnostic outputs, the temperature rate of change is represented by the following equation:
 
-temp_rate = temp_xadv + temp_yadv + temp_vadv + temp_xdiff + temp_ydiff + $\int$ temp_vdiff $dz$
+temp_rate = temp_xadv + temp_yadv + temp_vadv + temp_xdiff + temp_ydiff + temp_vdiff
 
 Using these terms, you can close the budget in any selected area within your domain.
 You can replace temp_xadv + temp_yadv by temp_hadv and the same for diffusion, temp_xdiff + temp_ydiff by temp_hdiff. Following is a image showing the equivalency of temp_xadv+temp_yadv = temp_hadv.
 
 ![Reconstructing temp_hadv with temp_xadv and temp_yadv](images/ohb_images/hadv_xadv_yadv.png)
+*Fig: Calculating temp_hadv based on the x and y terms.*
 
 The temp_rate variable is provided, but you can also calculate it using all the variables above. 
 
@@ -60,6 +67,9 @@ output_temp_tendency = (diag.temp_rate * volume).sum(['s_rho', 'xi_rho', 'eta_rh
 
 ```
 
+<br>
+<br>
+
 ![Comparing temp_rate](images/ohb_images/temp_rate_comparison.png)
 *Fig: Comparison between output temp_rate and calcualted by hand using the diagnostic terms.*
 
@@ -69,8 +79,11 @@ output_temp_tendency = (diag.temp_rate * volume).sum(['s_rho', 'xi_rho', 'eta_rh
 <br>
 
 About the air-sea heat flux in [ROMS forum](https://www.myroms.org/forum/viewtopic.php?t=2420).
+Because the air-sea heat flux is applied as the surface boundary condition to temp_vdiff and so is already included in the vertical divergence.
+> If you vertically integrate temp_vdiff = d/dz*(K_v*dT/dz) between the limits z = -h and z = zeta then you should simply get K_v*dT/dz |z = zeta minus K_v*dT/dz |z = -h which is shflux/(Cp*rho0) minus 0. 
 
-
+<br>
+<br>
 
 ## Huon_temp and Hvom_temp and temp_hadv relationship
 One of the big lessons while trying to compare variables calculated in AVG (in this case Huon_temp and Hvom_temp) with variables calculated in DIA (like temp_xadv and temp_yadv) is that they are not comparable.
@@ -81,11 +94,8 @@ There are important differences while theses variables are being calculated when
 >The _xadv and _yadv terms (and their divergence which is already saved for you in the companion _hadv diagnostics) are the fluxes through the faces (time averaged) exactly as ROMS computed them according to the selected advection scheme. In the case of the high order Akima and weighted-upwind schemes, these fluxes are computed over a 3 or 4 grid cell stencil so their divergence is not a simple difference of the u*temp terms on the faces of a single cell. 
 >Moreover, the ROMS time varying vertical s-coordinate means that the cell thickness, H, and hence cell face area itself (H/n) varies with time on every time step. Thus the time average <u*temp> multiplied by the time average layer area <H/n> is not exactly equal to <H/n*u*temp> because the triple nonlinearity of the perturbations <H'u'temp'> is not zero.
 
-## Understanding the diagnostic data
-
-
-
-
+<br>
+<br>
 
 ## Good practices when analysing the data
 - Masking land with NaN, to make sure it won't influentiate when integrating.
