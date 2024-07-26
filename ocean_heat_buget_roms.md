@@ -37,18 +37,53 @@ In terms of ROMS diagnostic outputs, this equation is in the following format:
 temp_rate = temp_xadv + temp_yadv + temp_vadv + temp_xdiff + temp_ydiff + $\int$ temp_vdiff $dz$
 
 Using these terms, you can close the budget in any selected area within your domain.
-You can replace temp_xadv + temp_yadv by temp_hadv and the same for diffusion, temp_xdiff + temp_ydiff by temp_hdiff. The temp_rate variable is provided, but you can also calculate it using all the variables above. 
+You can replace temp_xadv + temp_yadv by temp_hadv and the same for diffusion, temp_xdiff + temp_ydiff by temp_hdiff. Following is a image showing the equivalency of temp_xadv+temp_yadv = temp_hadv.
 
+![Reconstructing temp_hadv with temp_xadv and temp_yadv](images/ohb_images/hadv_xadv_yadv.png)
+
+The temp_rate variable is provided, but you can also calculate it using all the variables above. 
+
+```python
+volume = dx * dy * dz
+
+# The order is: horizontal advection (x and y), vertical adv, horizontal (x and y) and vertical diffusitity (z)
+# Multiplying per volume and summing the 3 dimensions: integral
+mine_heat_budget = (diag.temp_xadv * volume).sum(['s_rho', 'xi_rho', 'eta_rho']) + (diag.temp_yadv * volume).sum(['s_rho', 'xi_rho', 'eta_rho']) + \
+                    (diag.temp_vadv * volume).sum(['s_rho', 'xi_rho', 'eta_rho']) + \
+                    (diag.temp_xdiff * volume).sum(['s_rho', 'xi_rho', 'eta_rho']) + (diag.temp_ydiff * volume).sum(['s_rho', 'xi_rho', 'eta_rho']) + \
+                    (diag.temp_vdiff * volume).sum(['s_rho', 'xi_rho', 'eta_rho'])
+
+
+# Temp rate is the temperature tendency output from the model. 
+# It's a daily 3D field and to compare with my calculation I also have to integrate it
+output_temp_tendency = (diag.temp_rate * volume).sum(['s_rho', 'xi_rho', 'eta_rho'])
+
+```
+
+![Comparing temp_rate](images/ohb_images/temp_rate_comparison.png)
+*Fig: Comparison between output temp_rate and calcualted by hand using the diagnostic terms.*
+
+
+
+<br>
+<br>
+
+About the air-sea heat flux in [ROMS forum](https://www.myroms.org/forum/viewtopic.php?t=2420).
 
 
 
 ## Huon_temp and Hvom_temp and temp_hadv relationship
-[Summarize the main points of the document and provide any concluding remarks.]
+One of the big lessons while trying to compare variables calculated in AVG (in this case Huon_temp and Hvom_temp) with variables calculated in DIA (like temp_xadv and temp_yadv) is that they are not comparable.
 
+There is a good topic in [ROMS' forum](https://www.myroms.org/forum/viewtopic.php?t=5481) about it.
+
+There are important differences while theses variables are being calculated when runing the model.
+>The _xadv and _yadv terms (and their divergence which is already saved for you in the companion _hadv diagnostics) are the fluxes through the faces (time averaged) exactly as ROMS computed them according to the selected advection scheme. In the case of the high order Akima and weighted-upwind schemes, these fluxes are computed over a 3 or 4 grid cell stencil so their divergence is not a simple difference of the u*temp terms on the faces of a single cell. 
+>Moreover, the ROMS time varying vertical s-coordinate means that the cell thickness, H, and hence cell face area itself (H/n) varies with time on every time step. Thus the time average <u*temp> multiplied by the time average layer area <H/n> is not exactly equal to <H/n*u*temp> because the triple nonlinearity of the perturbations <H'u'temp'> is not zero.
 
 ## Understanding the diagnostic data
 
-![Reconstructing temp_hadv with temp_xadv and temp_yadv](images/ohb_images/hadv_xadv_yadv.png)
+
 
 
 
