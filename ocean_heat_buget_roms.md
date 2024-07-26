@@ -261,7 +261,7 @@ But for diffusive fluxes, the Hz/mn term multiplies only dC/dxi (e.g. Eqn. 11 at
 - Calculate your own temp_rate and comparing with the model output
 - Calculate your own air-sea flux as the vertical integral of the temp_vdiff and compare with the air-sea flux provided in the average data (to be confirmed...)
 - Because the DIA files can't be read with xroms, since it does not contain the zeta variable (for the version used as reference while writing this document), to easily have the metrics calculated, read the AVG file with xroms and assign the metrics to the DIA files read with xarray.
-- When calculating the heat you'll need the $\rho_0$ and $C_p$. These values have to come form the model, and you can find in the file called /g/data/fu5/trunk/ROMS/Modulesmod_scalars.F on Gadi. Sometimes I used approximate values showed in this file.
+- When calculating the heat you'll need the $\rho_0$ and $C_p$. These values have to come from the model, and you can find them in the file called /g/data/fu5/trunk/ROMS/Modules/mod_scalars.F on Gadi. Sometimes I used approximate values showed in this file.
 
 
 <!-- ## References
