@@ -241,7 +241,7 @@ horizontal_diffusion.sum('s_rho').where(ds.h<200).where(~ds.dz.isel(s_rho=-1).is
 
 *Fig: Horizontal diffusion vertically integrated.*
 
-John Wilking words about the efficiency of calculating by hand the horizontal mixing:
+John Wilkin words about the efficiency of calculating by hand the horizontal mixing:
 >Diffusive fluxes through a cell side multiplied by elemental area (I think that's what you are asking, in analogy to advective flux u*temp times cell face area H_on_n) are not diagnostics we save. 
 
 >The saved diffusion term is only the flux divergence. 
