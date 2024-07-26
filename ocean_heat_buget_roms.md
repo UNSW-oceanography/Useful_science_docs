@@ -110,6 +110,7 @@ plt.legend()
 <br>
 
 ![air-sea-flux](images/ohb_images/air_sea_flux_comparison.png)
+
 *Fig: Air-Sea heat flux Volume integrated for the whole domain over time.*
 
 <br>
@@ -137,6 +138,7 @@ fig.tight_layout()
 <br>
 
 ![air-sea-flux](images/ohb_images/air_sea_flux_comp_spatial.png)
+
 *Fig: Time-mean air-Sea heat flux vertical integrated for the whole domain.*
 
 
@@ -181,12 +183,8 @@ And these are the comparison.
 <br>
 
 ![comp1](images/ohb_images/comp1.png)
-
-<br>
-<br>
-
 ![comp2](images/ohb_images/comp2.png)
-
+*Fig: comparison between yadv and Hvom.*
 <br>
 <br>
 
@@ -196,13 +194,64 @@ And the comparison over time to see if there was an accumulative factor. Which c
 <br>
 
 ![comp_overtime](images/ohb_images/comp_overtime.png)
-
+*Fig: comparison between yadv and Hvom over time.*
 
 <br>
 <br>
 
 ## The diffusion term
-something here
+Based on all the information provided, how would be possible to calculate the heat transport across contours? In this case, only Hu/Hv aren't enough. We also need the diffusion terms. And for those, we need to calculate them. 
+
+First of all, you need to figure out, which scheme you have used in the model setup. And from that, calculate [manually the diffusion](https://www.myroms.org/wiki/Horizontal_Mixing#Horizontal_Diffusion). 
+
+In my case, I have to use the Laplacian horizontal diffusion. A way to find this is looking the cpp defs. My model has TS_DIF2 (harmonic mixing tracers) and if biharmonic, it would have defined TS_DIF4 ([have a look into the CPP defs](https://www.myroms.org/wiki/cppdefs.h#Options_for_horizontal_mixing_of_tracers))
+
+
+I have managed to calculate the horizontal diffusion. The $\nu2$ value come from the *ocean.in* file, and it is equal to 55.
+
+$\frac{\partial}{\partial \xi}\Big(\frac{\nu_2H_zm}{n}\frac{\partial C}{\partial \xi}\Big) + \frac{\partial}{\partial \eta}\Big(\frac{\nu_2H_zn}{m}\frac{\partial C}{\partial \eta}\Big)$
+
+
+```python
+
+# Value for the viscosity horizontal diffusion coefficient (from ocean.in)
+nu2 = 55
+
+dtemp_dxi = (temp.shift(xi_rho=-1) - temp.shift(xi_rho=1)) / (ds.dx.shift(xi_rho=-1) + ds.dx.shift(xi_rho=1))
+dtemp_deta = (temp.shift(eta_rho=-1) - temp.shift(eta_rho=1)) / (ds.dy.shift(eta_rho=-1) + ds.dy.shift(eta_rho=1))
+
+term1 = (nu2 * ds.dz * ds.dx / ds.dy) * dtemp_dxi
+term2 = (nu2 * ds.dz * ds.dy / ds.dx) * dtemp_deta
+
+# Derivatives of the terms using centered differences
+dterm1_dxi = (term1.shift(xi_rho=-1) - term1.shift(xi_rho=1)) / (ds.dx.shift(xi_rho=-1) + ds.dx.shift(xi_rho=1))
+dterm2_deta = (term2.shift(eta_rho=-1) - term2.shift(eta_rho=1)) / (ds.dy.shift(eta_rho=-1) + ds.dy.shift(eta_rho=1))
+
+
+# Sum the components to get the horizontal diffusion term
+horizontal_diffusion = dterm1_dxi + dterm2_deta
+
+horizontal_diffusion.sum('s_rho').where(ds.h<200).where(~ds.dz.isel(s_rho=-1).isnull()).isel(ocean_time=-1).plot()
+
+```
+<br>
+<br>
+
+![horizontal diff](images/ohb_images/horizontal_diffusion.png)
+
+*Fig: Horizontal diffusion vertically integrated.*
+
+John Wilking words about the efficiency of calculating by hand the horizontal mixing:
+>Diffusive fluxes through a cell side multiplied by elemental area (I think that's what you are asking, in analogy to advective flux u*temp times cell face area H_on_n) are not diagnostics we save. 
+
+>The saved diffusion term is only the flux divergence. 
+See the docs at https://www.myroms.org/wiki/Horizontal_Mixing#Horizontal_Diffusion for guidance on the correct way to calculate these.
+
+>I created the Huon outputs because in tidal flows there can be a very strong nonlinear triple correlation between sea level (hence Hz) and phase of tide (u) and tracer. Using average zeta times the conventional u*temp average didn't balance. 
+But for diffusive fluxes, the Hz/mn term multiplies only dC/dxi (e.g. Eqn. 11 at the link above) and you don't have that complicated nonlinearity of a correlated velocity. You should be able to get a nice balance. 
+
+
+
 
 <br>
 <br>
