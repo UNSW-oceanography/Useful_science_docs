@@ -31,9 +31,8 @@ $$
 ## The ROMS diagnostic and average outputs
 In terms of ROMS, this equation is in the following format:
 
-$$
 temp\_rate = temp\_xadv + temp\_yadv + temp\_vadv + temp\_xdiff + temp\_ydiff + \int temp\_vdiff dz
-$$
+
 
 
 
