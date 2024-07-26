@@ -48,7 +48,7 @@ You can replace temp_xadv + temp_yadv by temp_hadv and the same for diffusion, t
 
 ## Understanding the diagnostic data
 
-![Reconstructing temp_hadv with temp_xadv and temp_yadv](images/hadv_xadv_yadv.png)
+![Reconstructing temp_hadv with temp_xadv and temp_yadv](images/ohb_images/hadv_xadv_yadv.png)
 
 
 
