@@ -8,8 +8,9 @@ This document aims to provide useful information about the heat budget in ROMS a
 
 ## Table of Contents
 1. [Introduction](#introduction)
-2. [The ROMS diagnostic and average outputs](#the-roms-diagnostic-and-average-outputs)
-3. [The heat budget equation](#the-heat-budget-equation)
+2. [The heat budget equation](#the-heat-budget-equation)
+3. [The ROMS diagnostic and average outputs](#the-roms-diagnostic-and-average-outputs)
+    - [The Air-sea heat flux](#the-air-sea-heat-flux)
 4. [Huon_temp and Hvom_temp and temp_hadv relationship](#huon_temp-and-hvom_temp-and-temp_hadv-relationship)
 5. [The diffusion term](#the-diffusion-term)
 6. [Good practices when analysing the data](#good-practices-when-analysing-the-data)
@@ -46,8 +47,14 @@ temp_rate = temp_xadv + temp_yadv + temp_vadv + temp_xdiff + temp_ydiff + temp_v
 Using these terms, you can close the budget in any selected area within your domain.
 You can replace temp_xadv + temp_yadv by temp_hadv and the same for diffusion, temp_xdiff + temp_ydiff by temp_hdiff. Following is a image showing the equivalency of temp_xadv+temp_yadv = temp_hadv.
 
+<br>
+<br>
+
 ![Reconstructing temp_hadv with temp_xadv and temp_yadv](images/ohb_images/hadv_xadv_yadv.png)
 *Fig: Calculating temp_hadv based on the x and y terms.*
+
+<br>
+<br>
 
 The temp_rate variable is provided, but you can also calculate it using all the variables above. 
 
@@ -78,6 +85,8 @@ output_temp_tendency = (diag.temp_rate * volume).sum(['s_rho', 'xi_rho', 'eta_rh
 
 <br>
 <br>
+
+### The Air-sea heat flux
 
 About the air-sea heat flux in [ROMS forum](https://www.myroms.org/forum/viewtopic.php?t=2420).
 Because the air-sea heat flux is applied as the surface boundary condition to temp_vdiff and so is already included in the vertical divergence.
@@ -143,20 +152,57 @@ There are important differences while theses variables are being calculated when
 >The _xadv and _yadv terms (and their divergence which is already saved for you in the companion _hadv diagnostics) are the fluxes through the faces (time averaged) exactly as ROMS computed them according to the selected advection scheme. In the case of the high order Akima and weighted-upwind schemes, these fluxes are computed over a 3 or 4 grid cell stencil so their divergence is not a simple difference of the u*temp terms on the faces of a single cell. 
 >Moreover, the ROMS time varying vertical s-coordinate means that the cell thickness, H, and hence cell face area itself (H/n) varies with time on every time step. Thus the time average <u*temp> multiplied by the time average layer area <H/n> is not exactly equal to <H/n*u*temp> because the triple nonlinearity of the perturbations <H'u'temp'> is not zero.
 
-Before knowing that, some tests were performed and even the result is quite the same, the two outputs have similarities.
-
-```python
-
-
-
-```
+Before knowing that, some tests were performed and even that the result are not quite the same, the two outputs have similarities. I did some analysis to compare them and the following plot shows the area used for that. It was chosen a shelf water area.
 
 <br>
 <br>
 
+![area analysed](images/ohb_images/area_analysed.png)
+*Fig: First pannel to the left to show that it was chosen columns and the other pannels shows the area used for the analysis.*
+
+<br>
+<br>
+
+I made sure that I was taking the right grid cells for the analysis.
+
+<br>
+<br>
+
+![grid selected](images/ohb_images/grid_selected_points.png)
+
+*Fig: Grid cells selected for both temp_yadv and Hvom_temp.*
+
+<br>
+<br>
+
+And these are the comparison.
+
+<br>
+<br>
+
+![comp1](images/ohb_images/comp1.png)
+
+<br>
+<br>
+
+![comp2](images/ohb_images/comp2.png)
+
+<br>
+<br>
+
+And the comparison over time to see if there was an accumulative factor. Which can't be seen.
+
+<br>
+<br>
+
+![comp_overtime](images/ohb_images/comp_overtime.png)
+
+
+<br>
+<br>
 
 ## The diffusion term
-
+something here
 
 <br>
 <br>
