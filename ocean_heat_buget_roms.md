@@ -9,7 +9,7 @@ This document aims to provide useful information about the heat budget in ROMS a
 ## Table of Contents
 1. [Introduction](#introduction)
 2. [The heat budget equation](#the-heat-budget-equation)
-3. [The ROMS diagnostic and average outputs](#the-roms-diagnostic-and-average-outputs)
+3. [The ROMS diagnostic](#the-roms-diagnostic)
     - [The Air-sea heat flux](#the-air-sea-heat-flux)
 4. [Huon_temp and Hvom_temp and temp_hadv relationship](#huon_temp-and-hvom_temp-and-temp_hadv-relationship)
 5. [The diffusion term](#the-diffusion-term)
@@ -38,7 +38,7 @@ $$
 <br>
 <br>
 
-## The ROMS diagnostic and average outputs
+## The ROMS diagnostic
 To obtain the OHB terms in ROMS you must use the diagnostic output. This output provides you all the necessary terms to close the heat budget.
 In terms of ROMS diagnostic outputs, the temperature rate of change is represented by the following equation:
 
