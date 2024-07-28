@@ -1,8 +1,11 @@
 # Ocean Heat Budget in ROMS
 ### Author: Fernando Sobral
 ### Date: 26/July/2024
-### Summary
+### <span class="darkred-text">Summary</span>
+
+<span class="darkred-text">
 This document aims to provide useful information about the heat budget in ROMS and best practices after a long process of analysis of the model outputs.
+The main challenge that initiated the analysis was to find the relationship between the divergent diagnostic terms and the flux terms from the averaged output. If this correlation could be done, it would be possible to use the flux terms on the grid faces with a proportional correspondence in the change of temperature in the grid cell center. The application of this correlation is that I could be confident with my cross-contour heat transport amount because it could be verified whithin the OHB.</span>
 
 ---
 
@@ -21,7 +24,7 @@ This document aims to provide useful information about the heat budget in ROMS a
 ---
 
 ## Introduction
-The Ocean Heat Budget (OHB) is a usefull approach to provide information about the ocean heat drivers. It is meant to give you an accurate decomposition of the terms controlling the temperature change over time in a specific area. 
+The Ocean Heat Budget (OHB) is a usefull approach to provide information about the ocean heat drivers. It is meant to give you an accurate decomposition of the terms controlling the temperature change over time in a specific area. This document contains relevant discussion that I have had with Neil Malan, Fabio Dias, Ryan Holmes and John Wilkin.
 
 <br>
 <br>
@@ -272,3 +275,13 @@ But for diffusive fluxes, the Hz/mn term multiplies only dC/dxi (e.g. Eqn. 11 at
 <!-- 
 ### Appendix (Optional)
 [Include any additional information or appendices here.] -->
+
+
+<style>
+.red-text {
+    color: red;
+}
+.darkred-text {
+    color: darkred;
+}
+</style>
