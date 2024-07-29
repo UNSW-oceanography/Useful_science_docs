@@ -3,7 +3,7 @@
 ### Date: 26/July/2024
 ### Summary
 
-This document aims to provide useful information about the heat budget in ROMS and best practices after a long process of analysis of the model outputs. It not only show the Ocean Heat Budget (OHB) terms correspondence, but also what can't be correlated. The take home message is that there isn't an easy correlation between the diagnostic terms (DIA) and the averaged terms (AVG) because of the difference in the advection and time-stepping schemes, so they won't be proportional as they are provided.
+This document aims to provide useful information about the heat budget in ROMS and best practices following a lengthy process of analyzing the model outputs. It not only shows the correspondence of Ocean Heat Budget (OHB) terms, but also what can’t be correlated. The key takeaway is that there isn’t a straightforward correlation between the diagnostic terms (DIA) and the averaged terms (AVG) due to differences in the advection and time-stepping schemes, so they won’t be proportional as provided. Therefore, it is easier to use them separately. 
 
 
 ---
@@ -23,17 +23,17 @@ This document aims to provide useful information about the heat budget in ROMS a
 ---
 
 ## Introduction
-The Ocean Heat Budget (OHB) is a usefull approach to provide information about the ocean heat drivers. It is meant to give you an accurate decomposition of the terms controlling the temperature change over time in a specific area. 
+The Ocean Heat Budget (OHB) is a useful approach to provide information about the drivers of ocean heat. It is designed to offer an accurate decomposition of the terms controlling the temperature change over time in a specific area.
 
-The main challenge that initiated the analysis was to find the relationship between the divergent diagnostic terms and the flux terms from the averaged output. If this correlation could be done, it would be possible to use the flux terms on the grid faces with a proportional correspondence in the change of temperature in the grid cell center. The application of this correlation is that it could give confidence that a cross-contour heat transport amount is correct because it is conserving the heat inside the system.
+The main challenge that initiated the analysis was to find the relationship between the divergent diagnostic terms and the flux terms (Huon_temp and Hvom_temp) from the averaged output. If this correlation could be established, it would be possible to use the flux terms on the grid faces with a proportional correspondence to the change in temperature at the grid cell center. The application of this correlation is that it could provide confidence that a cross-contour heat transport amount is correct because it conserves the heat within the system.
 
-This document contains relevant discussion that I have had with Neil Malan, Fabio Dias, Ryan Holmes and John Wilkin.
+This document contains relevant discussions that I have had with Neil Malan, Fabio Dias, Ryan Holmes, and John Wilkin.
 
 <br>
 
 ## The heat budget equation
 
-By design, the ROMS model satisfy the heat conservation equation at every grid poing. The time evolution of temperature in the ocean is given by the sum of net heat exchange with the atmosphere, divergence of advective heat transport by horizontal and vertical velocities, and three-dimensional diffusive processes:
+By design, the ROMS model satisfies the heat conservation equation at every grid point. The time evolution of temperature in the ocean is given by the sum of net heat exchange with the atmosphere, divergence of advective heat transport by horizontal and vertical velocities, and three-dimensional diffusive processes:
 
 $$
 \frac{\partial T}{\partial t} = \frac{\partial Q}{\partial z} - \rho_0 c_p \Big[ \textbf{u} \cdot \nabla T - \Big( \kappa_H \nabla^2_H T + \kappa_z \frac{\partial^2 T}{\partial z^2} + K^{turb}_T \Big)\Big ]
@@ -43,13 +43,11 @@ $$
 <br>
 
 ## The ROMS diagnostic
-To obtain the OHB terms in ROMS you must use the diagnostic output. This output provides you all the necessary terms to close the heat budget.
-In terms of ROMS diagnostic outputs, the temperature rate of change is represented by the following equation:
+To obtain the OHB terms in ROMS, you must use the diagnostic output. This output provides all the necessary terms to close the heat budget. When considering the diagnostic outputs provided by ROMS, the rate of temperature change is represented by the following equation:
 
 temp_rate = temp_xadv + temp_yadv + temp_vadv + temp_xdiff + temp_ydiff + temp_vdiff
 
-Using these terms, you can close the budget in any selected area within your domain.
-You can replace temp_xadv + temp_yadv by temp_hadv and the same for diffusion, temp_xdiff + temp_ydiff by temp_hdiff. Following is a image showing the equivalency of temp_xadv+temp_yadv = temp_hadv.
+Using these terms, you can close the budget in any selected area within your domain. You can replace temp_xadv + temp_yadv with temp_hadv and similarly for diffusion, replace temp_xdiff + temp_ydiff with temp_hdiff. Following is an image showing the equivalency of temp_xadv + temp_yadv = temp_hadv.
 
 <br>
 
