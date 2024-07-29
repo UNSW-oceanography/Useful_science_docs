@@ -9,7 +9,7 @@ This document aims to provide useful information about the heat budget in ROMS a
 ---
 
 ## Table of Contents
-0. [The problem tried to be solved](#the-problem-tried-to-be-solved)
+0. [The problem being addressed](#the-problem-being-addressed)
 1. [Introduction](#introduction)
 2. [The heat budget equation](#the-heat-budget-equation)
 3. [The ROMS diagnostic](#the-roms-diagnostic)
@@ -17,13 +17,11 @@ This document aims to provide useful information about the heat budget in ROMS a
 4. [Huon_temp and Hvom_temp and temp_hadv relationship](#huon_temp-and-hvom_temp-and-temp_hadv-relationship)
 5. [The diffusion term](#the-diffusion-term)
 6. [Good practices when analysing the data](#good-practices-when-analysing-the-data)
-<!-- 5. [References](#references) -->
-
 
 
 ---
 
-## The problem tried to be solved
+## The problem being addressed
 
 **The main challenge that initiated the analysis was to find the relationship between the divergent diagnostic terms and the flux terms (Huon_temp and Hvom_temp) from the averaged output. If this correlation could be established, it would be possible to use the flux terms on the grid faces with a proportional correspondence to the change in temperature at the grid cell center. The application of this correlation is that it could provide confidence that a cross-contour heat transport amount is correct because it conserves the heat within the system.**
 
@@ -270,12 +268,5 @@ But for diffusive fluxes, the Hz/mn term multiplies only dC/dxi (e.g. Eqn. 11 at
 - When calculating the heat you'll need the $\rho_0$ and $C_p$. These values have to come from the model, and you can find them in the file called /g/data/fu5/trunk/ROMS/Modules/mod_scalars.F on Gadi. Sometimes I used approximate values showed in this file.
 
 
-<!-- ## References
-[1] [Reference 1]
-[2] [Reference 2] -->
-
 ---
-<!-- 
-### Appendix (Optional)
-[Include any additional information or appendices here.] -->
 
