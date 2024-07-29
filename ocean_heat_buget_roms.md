@@ -183,7 +183,9 @@ I made sure that I was taking the right grid cells for the analysis.
 <br>
 <br>
 
-And these are the comparison calculated as the vertical integral and then calculating the divergent and the difference with the diagnostic divergent:
+And the next plots are the comparison calculated as the vertical integral and then calculating the divergent and the difference with the diagnostic divergent. 
+The red circles are from the temp_yadv and black circles from Hvom_temp. From the difference, the error is of less than 1% for these examples. 
+
 
 ```python
 # All dots selected
@@ -227,7 +229,6 @@ for down, up in zip(range(0, hvom0.eta_v.shape[0]), range(1, hvom0.eta_v.shape[0
     fig.tight_layout()
 ```
 
-The red circles are from the temp_yadv and black circles from Hvom_temp. From the difference, the error is of less than 1% for these examples. 
 
 <br>
 <br>
