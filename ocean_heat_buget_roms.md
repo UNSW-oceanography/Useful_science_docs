@@ -183,14 +183,21 @@ I made sure that I was taking the right grid cells for the analysis.
 <br>
 <br>
 
-And these are the comparison.
+And these are the comparison calculated as the vertical integral and then 
+
+```python
+my_temp_yadv = Hvom_temp(i+1) - Hvom_temp(i)
+
+```
+
+The red circles are from the temp_yadv and black circles from Hvom_temp. From the difference, the error is of less than 1% for these examples. 
 
 <br>
 <br>
 
 ![comp1](images/ohb_images/comp1.png)
 ![comp2](images/ohb_images/comp2.png)
-*Fig: comparison between yadv and Hvom.*
+*Fig: comparison between temp_yadv and Hvom_temp.*
 <br>
 <br>
 
@@ -200,7 +207,7 @@ And the comparison over time to see if there was an accumulative factor. Which c
 <br>
 
 ![comp_overtime](images/ohb_images/comp_overtime.png)
-*Fig: comparison between yadv and Hvom over time.*
+*Fig: comparison between temp_yadv and Hvom_temp over time.*
 
 <br>
 <br>
@@ -210,12 +217,12 @@ Based on all the information provided, how would be possible to calculate the he
 
 First of all, you need to figure out, which scheme you have used in the model setup. And from that, calculate [manually the diffusion](https://www.myroms.org/wiki/Horizontal_Mixing#Horizontal_Diffusion). 
 
-In my case, I have to use the Laplacian horizontal diffusion. A way to find this is looking the cpp defs. My model has TS_DIF2 (harmonic mixing tracers) and if biharmonic, it would have defined TS_DIF4 ([have a look into the CPP defs](https://www.myroms.org/wiki/cppdefs.h#Options_for_horizontal_mixing_of_tracers))
+In my case, I have to use the Laplacian horizontal diffusion. A way to find this is looking the cpp defs. My model has TS_DIF2 (harmonic mixing tracers) and if biharmonic, it would have defined TS_DIF4 ([have a look into the CPP defs](https://www.myroms.org/wiki/cppdefs.h#Options_for_horizontal_mixing_of_tracers)).
 
 
 I have managed to calculate the horizontal diffusion. The $\nu2$ value come from the *ocean.in* file, and it is equal to 55.
 
-$\frac{\partial}{\partial \xi}\Big(\frac{\nu_2H_zm}{n}\frac{\partial C}{\partial \xi}\Big) + \frac{\partial}{\partial \eta}\Big(\frac{\nu_2H_zn}{m}\frac{\partial C}{\partial \eta}\Big)$
+$$\frac{\partial}{\partial \xi}\Big(\frac{\nu_2H_zm}{n}\frac{\partial C}{\partial \xi}\Big) + \frac{\partial}{\partial \eta}\Big(\frac{\nu_2H_zn}{m}\frac{\partial C}{\partial \eta}\Big)$$
 
 
 ```python
