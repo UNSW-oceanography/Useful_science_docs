@@ -83,7 +83,7 @@ output_temp_tendency = (diag.temp_rate * volume).sum(['s_rho', 'xi_rho', 'eta_rh
 <br>
 
 ![Comparing temp_rate](images/ohb_images/temp_rate_comparison.png)
-*Fig: Comparison between output temp_rate and calcualted by hand using the diagnostic terms.*
+*Fig: Comparison between the volume integrated output temp_rate and calculated by hand using the diagnostic terms.*
 
 
 
@@ -95,6 +95,8 @@ output_temp_tendency = (diag.temp_rate * volume).sum(['s_rho', 'xi_rho', 'eta_rh
 About the air-sea heat flux in [ROMS forum](https://www.myroms.org/forum/viewtopic.php?t=2420).
 Because the air-sea heat flux is applied as the surface boundary condition to temp_vdiff and so is already included in the vertical divergence.
 > If you vertically integrate temp_vdiff = d/dz*(K_v*dT/dz) between the limits z = -h and z = zeta then you should simply get K_v*dT/dz |z = zeta minus K_v*dT/dz |z = -h which is shflux/(Cp*rho0) minus 0. 
+
+The small differences is likelly due to the wrong Cp value used here, that was an approximation. The proper value used in the model can be found in [Good practices when analysing the data](#specific-heat-capacity).
 
 ```python
 Cp = 4181.3
@@ -265,6 +267,7 @@ But for diffusive fluxes, the Hz/mn term multiplies only dC/dxi (e.g. Eqn. 11 at
 - Calculate your own temp_rate and comparing with the model output
 - Calculate your own air-sea flux as the vertical integral of the temp_vdiff and compare with the air-sea flux provided in the average data (to be confirmed...)
 - Because the DIA files can't be read with xroms, since it does not contain the zeta variable (for the version used as reference while writing this document), to easily have the metrics calculated, read the AVG file with xroms and assign the metrics to the DIA files read with xarray.
+<a name="specific-heat-capacity"></a>
 - When calculating the heat you'll need the $\rho_0$ and $C_p$. These values have to come from the model, and you can find them in the file called /g/data/fu5/trunk/ROMS/Modules/mod_scalars.F on Gadi. Sometimes I used approximate values showed in this file.
 
 
