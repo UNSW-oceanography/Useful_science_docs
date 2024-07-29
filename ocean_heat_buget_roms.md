@@ -183,11 +183,48 @@ I made sure that I was taking the right grid cells for the analysis.
 <br>
 <br>
 
-And these are the comparison calculated as the vertical integral and then 
+And these are the comparison calculated as the vertical integral and then calculating the divergent and the difference with the diagnostic divergent:
 
 ```python
-my_temp_yadv = Hvom_temp(i+1) - Hvom_temp(i)
+# All dots selected
+def new_fig():
+    fig, ax = plt.subplots(ncols=3, figsize=(15, 5))
+    ax[0].scatter(lon_v, lat_v, label='Hvom')
+    ax[0].scatter(lon_rho[1:, 1:], lat_rho[1:, 1:], label='Yadv')
+    ax[0].set_title('Both SLICED together');
+    ax[0].legend();
+    return fig, ax
 
+
+# Selected area to be used in the calculation
+hvom0 = hvom_temp.isel(xi_rho=slice(89, 95)).isel(eta_v=slice(0, None)).sum('s_rho')
+yadv0 = (temp_yadv * (dx * dy * dz)).isel(xi_rho=slice(89, 95), eta_rho=slice(1, None)).sum('s_rho')
+
+for down, up in zip(range(0, hvom0.eta_v.shape[0]), range(1, hvom0.eta_v.shape[0])):
+    print(down, up)
+    fig, ax = new_fig()
+    hvom00 = hvom0.isel(eta_v=down)
+    hvom01 = hvom0.isel(eta_v=up)
+    yadv00 = yadv0.isel(eta_rho=down)
+    ax[0].plot(hvom00.lon_v, hvom00.lat_v, 'ok')
+    ax[0].plot(hvom01.lon_v, hvom01.lat_v, 'ok')
+    ax[0].plot(yadv00.lon_rho, yadv00.lat_rho, 'or')
+
+    # Calculations
+    dvg = hvom00 - hvom01
+
+    # Comparing plot
+    ax[1].plot(dvg, 'o-k', label='Div Hvom')
+    ax[1].plot(yadv00, '--or', label='yadv')
+    # ax[0].plot(yadv00.lon_rho, yadv00.lat_rho, 'or')
+    ax[1].set_title('Comparing')
+    ax[1].legend()
+
+    # Difference
+    diff_dvg = yadv00 - dvg
+    ax[2].plot(diff_dvg, '-ok')
+    ax[2].set_title('Difference yadv - div Hvom')
+    fig.tight_layout()
 ```
 
 The red circles are from the temp_yadv and black circles from Hvom_temp. From the difference, the error is of less than 1% for these examples. 
