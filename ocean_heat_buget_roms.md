@@ -1,11 +1,10 @@
 # Ocean Heat Budget in ROMS
 ### Author: Fernando Sobral
 ### Date: 26/July/2024
-### <span class="darkred-text">Summary</span>
+### Summary
 
-<span class="darkred-text">
-This document aims to provide useful information about the heat budget in ROMS and best practices after a long process of analysis of the model outputs.
-The main challenge that initiated the analysis was to find the relationship between the divergent diagnostic terms and the flux terms from the averaged output. If this correlation could be done, it would be possible to use the flux terms on the grid faces with a proportional correspondence in the change of temperature in the grid cell center. The application of this correlation is that I could be confident with my cross-contour heat transport amount because it could be verified whithin the OHB.</span>
+This document aims to provide useful information about the heat budget in ROMS and best practices after a long process of analysis of the model outputs. It not only show the Ocean Heat Budget (OHB) terms correspondence, but also what can't be correlated. The take home message is that there isn't an easy correlation between the diagnostic terms (DIA) and the averaged terms (AVG) because of the difference in the advection and time-stepping schemes, so they won't be proportional as they are provided.
+
 
 ---
 
@@ -24,9 +23,12 @@ The main challenge that initiated the analysis was to find the relationship betw
 ---
 
 ## Introduction
-The Ocean Heat Budget (OHB) is a usefull approach to provide information about the ocean heat drivers. It is meant to give you an accurate decomposition of the terms controlling the temperature change over time in a specific area. This document contains relevant discussion that I have had with Neil Malan, Fabio Dias, Ryan Holmes and John Wilkin.
+The Ocean Heat Budget (OHB) is a usefull approach to provide information about the ocean heat drivers. It is meant to give you an accurate decomposition of the terms controlling the temperature change over time in a specific area. 
 
-<br>
+The main challenge that initiated the analysis was to find the relationship between the divergent diagnostic terms and the flux terms from the averaged output. If this correlation could be done, it would be possible to use the flux terms on the grid faces with a proportional correspondence in the change of temperature in the grid cell center. The application of this correlation is that it could give confidence that a cross-contour heat transport amount is correct because it is conserving the heat inside the system.
+
+This document contains relevant discussion that I have had with Neil Malan, Fabio Dias, Ryan Holmes and John Wilkin.
+
 <br>
 
 ## The heat budget equation
@@ -39,7 +41,6 @@ $$
 
 
 <br>
-<br>
 
 ## The ROMS diagnostic
 To obtain the OHB terms in ROMS you must use the diagnostic output. This output provides you all the necessary terms to close the heat budget.
@@ -51,12 +52,10 @@ Using these terms, you can close the budget in any selected area within your dom
 You can replace temp_xadv + temp_yadv by temp_hadv and the same for diffusion, temp_xdiff + temp_ydiff by temp_hdiff. Following is a image showing the equivalency of temp_xadv+temp_yadv = temp_hadv.
 
 <br>
-<br>
 
 ![Reconstructing temp_hadv with temp_xadv and temp_yadv](images/ohb_images/hadv_xadv_yadv.png)
 *Fig: Calculating temp_hadv based on the x and y terms.*
 
-<br>
 <br>
 
 The temp_rate variable is provided, but you can also calculate it using all the variables above. 
@@ -276,12 +275,3 @@ But for diffusive fluxes, the Hz/mn term multiplies only dC/dxi (e.g. Eqn. 11 at
 ### Appendix (Optional)
 [Include any additional information or appendices here.] -->
 
-
-<style>
-.red-text {
-    color: red;
-}
-.darkred-text {
-    color: darkred;
-}
-</style>
