@@ -9,6 +9,7 @@ This document aims to provide useful information about the heat budget in ROMS a
 ---
 
 ## Table of Contents
+0. [The problem tried to be solved](#the-problem-tried-to-be-solved)
 1. [Introduction](#introduction)
 2. [The heat budget equation](#the-heat-budget-equation)
 3. [The ROMS diagnostic](#the-roms-diagnostic)
@@ -22,10 +23,15 @@ This document aims to provide useful information about the heat budget in ROMS a
 
 ---
 
-## Introduction
-The Ocean Heat Budget (OHB) is a useful approach to provide information about the drivers of ocean heat. It is designed to offer an accurate decomposition of the terms controlling the temperature change over time in a specific area.
+## The problem tried to be solved
 
 **The main challenge that initiated the analysis was to find the relationship between the divergent diagnostic terms and the flux terms (Huon_temp and Hvom_temp) from the averaged output. If this correlation could be established, it would be possible to use the flux terms on the grid faces with a proportional correspondence to the change in temperature at the grid cell center. The application of this correlation is that it could provide confidence that a cross-contour heat transport amount is correct because it conserves the heat within the system.**
+
+
+---
+
+## Introduction
+The Ocean Heat Budget (OHB) is a useful approach to provide information about the drivers of ocean heat. It is designed to offer an accurate decomposition of the terms controlling the temperature change over time in a specific area.
 
 This document contains relevant discussions that I have had with Neil Malan, Fabio Dias, Ryan Holmes, and John Wilkin.
 
