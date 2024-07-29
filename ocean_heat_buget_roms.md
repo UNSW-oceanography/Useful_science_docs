@@ -234,7 +234,7 @@ The red circles are from the temp_yadv and black circles from Hvom_temp. From th
 
 ![comp1](images/ohb_images/comp1.png)
 ![comp2](images/ohb_images/comp2.png)
-*Fig: comparison between temp_yadv and Hvom_temp.*
+*Fig: comparison between temp_yadv and Hvom_temp. The x-axis for the subplot in the center and to the right represents the six grid cells being compared.*
 <br>
 <br>
 
