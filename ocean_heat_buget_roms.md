@@ -15,7 +15,7 @@ This document aims to provide useful information about the heat budget in ROMS a
 3. [The ROMS diagnostic](#the-roms-diagnostic)
     - [The Air-sea heat flux](#the-air-sea-heat-flux)
 4. [Huon_temp and Hvom_temp and temp_hadv relationship](#huon_temp-and-hvom_temp-and-temp_hadv-relationship)
-5. [The diffusion term](#the-diffusion-term)
+5. [ The horizontal diffusion term calculation](#the-horizontal-diffusion-term-calculation)
 6. [Good practices when analysing the data](#good-practices-when-analysing-the-data)
 
 
@@ -250,7 +250,7 @@ And the comparison over time to see if there was an accumulative factor. Which c
 <br>
 <br>
 
-## The diffusion term
+## The horizontal diffusion term calculation
 Based on all the information provided, how would be possible to calculate the heat transport across contours? In this case, only Huon/Hvom_temp aren't enough. We also need the diffusion terms. And for those, we need to calculate them. 
 
 First of all, you need to figure out, which scheme you have used in the model setup. And from that, calculate [manually the diffusion](https://www.myroms.org/wiki/Horizontal_Mixing#Horizontal_Diffusion). 
