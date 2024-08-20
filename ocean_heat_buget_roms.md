@@ -300,7 +300,7 @@ $$
 \frac{1}{dy} \frac{\partial C}{\partial \eta}
 $$
 
-4. Always check the units! If your goal it to calculate the diffusive flux, them it need $m^3s^{-1} \degree C$. For the divergence and therefore to be able to do your sanity check, you'll need units like $\degree C s^{-1}$.
+4. Always check the units! If your goal is to calculate the diffusive flux, them it need $m^3s^{-1} \degree C$. For the divergence and therefore to be able to do your sanity check, you'll need units like $\degree C s^{-1}$.
 
 You will need the diffusive coefficient $\nu2$ value, and can find it in the *ocean.in* file, and it is equal to 55 in my case.
 
@@ -362,6 +362,9 @@ hdiff_temp_ = xdiff_temp_ + ydiff_temp_
 ![horizontal diff](images/ohb_images/comparing_hdiff.png)
 
 *Fig: Rate of change comparisson between the temp_hdiff from diagnostic and my manual calculation shown here.*
+
+<br>
+<br>
 
 John Wilkin words about the topic can be found on the [ROMS forum](https://www.myroms.org/forum/viewtopic.php?p=25568#p25568) and in private messages:
 
