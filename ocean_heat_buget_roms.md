@@ -251,61 +251,140 @@ And the comparison over time to see if there was an accumulative factor. Which c
 <br>
 
 ## The diffusion term
-Based on all the information provided, how would be possible to calculate the heat transport across contours? In this case, only Hu/Hv aren't enough. We also need the diffusion terms. And for those, we need to calculate them. 
+Based on all the information provided, how would be possible to calculate the heat transport across contours? In this case, only Huon/Hvom_temp aren't enough. We also need the diffusion terms. And for those, we need to calculate them. 
 
 First of all, you need to figure out, which scheme you have used in the model setup. And from that, calculate [manually the diffusion](https://www.myroms.org/wiki/Horizontal_Mixing#Horizontal_Diffusion). 
 
 In my case, I have to use the Laplacian horizontal diffusion. A way to find this is looking the cpp defs. My model has TS_DIF2 (harmonic mixing tracers) and if biharmonic, it would have defined TS_DIF4 ([have a look into the CPP defs](https://www.myroms.org/wiki/cppdefs.h#Options_for_horizontal_mixing_of_tracers)).
 
 
-I have managed to calculate the horizontal diffusion. The $\nu2$ value come from the *ocean.in* file, and it is equal to 55.
-
 $$\frac{\partial}{\partial \xi}\Big(\frac{\nu_2H_zm}{n}\frac{\partial C}{\partial \xi}\Big) + \frac{\partial}{\partial \eta}\Big(\frac{\nu_2H_zn}{m}\frac{\partial C}{\partial \eta}\Big)$$
 
+
+Important concepts to have in mind before you start the calculation. 
+1. You need to consider the s-layers when doing a horizontal derivative in ROMS. You need to calculate the gradient for the same z-layer. The easiest way of doing it is to use the already made tools. In my case, I used xroms ddxi and ddeta.
+
+2. The notation $m$ and $n$ here is equivalent to $pm$ and $pn$, respectivelly. Given:
+
+$$
+dx = \frac{1}{pm} \ \mathrm{or} \ \frac{1}{m} 
+$$
+
+and
+
+$$
+dy = \frac{1}{pn} \ \mathrm{or} \ \frac{1}{n}
+$$
+
+3. $\xi$ and $\eta$ are non-dimension in the equation and what gives them dimension is the multiplication of:
+
+$$
+m \frac{\partial C}{\partial \xi}
+$$
+
+and 
+
+$$
+n \frac{\partial C}{\partial \eta}
+$$
+
+or using dx and dy:
+
+$$
+\frac{1}{dx} \frac{\partial C}{\partial \xi}
+$$
+
+and
+
+$$
+\frac{1}{dy} \frac{\partial C}{\partial \eta}
+$$
+
+4. Always check the units! If your goal it to calculate the diffusive flux, them it need $m^3s^{-1} \degree C$. For the divergence and therefore to be able to do your sanity check, you'll need units like $\degree C s^{-1}$.
+
+You will need the diffusive coefficient $\nu2$ value, and can find it in the *ocean.in* file, and it is equal to 55 in my case.
+
+
+Here is the code I use to calculate the diffusive flux and the divergence.
 
 ```python
 
 # Value for the viscosity horizontal diffusion coefficient (from ocean.in)
 nu2 = 55
 
-dtemp_dxi = (temp.shift(xi_rho=-1) - temp.shift(xi_rho=1)) / (ds.dx.shift(xi_rho=-1) + ds.dx.shift(xi_rho=1))
-dtemp_deta = (temp.shift(eta_rho=-1) - temp.shift(eta_rho=1)) / (ds.dy.shift(eta_rho=-1) + ds.dy.shift(eta_rho=1))
 
-term1 = (nu2 * ds.dz * ds.dx / ds.dy) * dtemp_dxi
-term2 = (nu2 * ds.dz * ds.dy / ds.dx) * dtemp_deta
+'''-------------------------------------
+First I calculate the gradient. And for this, I am already considering dx, dy for the x- and y-derivatives
+-------------------------------------'''
 
-# Derivatives of the terms using centered differences
-dterm1_dxi = (term1.shift(xi_rho=-1) - term1.shift(xi_rho=1)) / (ds.dx.shift(xi_rho=-1) + ds.dx.shift(xi_rho=1))
-dterm2_deta = (term2.shift(eta_rho=-1) - term2.shift(eta_rho=1)) / (ds.dy.shift(eta_rho=-1) + ds.dy.shift(eta_rho=1))
+# Partial derivatives in XI and ETA.
+
+dtemp_dxi_ = xroms.ddxi(ds_avg.temp, xgrid, scoord='s_rho')
+dtemp_deta_ = xroms.ddeta(ds_avg.temp, xgrid, scoord='s_rho')
 
 
-# Sum the components to get the horizontal diffusion term
-horizontal_diffusion = dterm1_dxi + dterm2_deta
+'''-------------------------------------
+Second multiplying by the diffusive coefficient and the respective areas: dz*dy for x-direction and dz*dx for y-direction. Before, I was also dividing by dx;dy here, because I didn't consider that xroms has already consider dx;dy areas. At this step, my units are m3 deg C/s
+-------------------------------------'''
 
-horizontal_diffusion.sum('s_rho').where(ds.h<200).where(~ds.dz.isel(s_rho=-1).isnull()).isel(ocean_time=-1).plot()
+# This is the calculation of the horizontal diffusive flux
+
+term1_ = ((nu2 * ds_avg.dz_u * ds_avg.dy_u)) * dtemp_dxi_
+term2_ = ((nu2 * ds_avg.dz_v * ds_avg.dx_v)) * dtemp_deta_
+
+
+'''-------------------------------------
+And then calculating the divergence of the diffusive flux. Again, it already consider dx;dy when doing the horizontal derivatives. At this step, I have units like m2 deg C/s
+----------------------------------------'''
+
+# Divergence of the diffusive flux
+dterm1_dxi_ = xroms.ddxi(term1_, xgrid, scoord='s_rho', attrs=term1_.attrs)
+dterm2_deta_ = xroms.ddeta(term2_, xgrid, scoord='s_rho', attrs=term2_.attrs)
+
+
+'''-------------------------------------
+And finally dividing by the respective areas to get deg C/s. Before, I thought that I would also needed to divide by dx the xdiff_temp_ and by dy the ydiff_temp_. But that is wrong since, again, xroms has done this already.
+-------------------------------------'''
+
+# Dividing by the metrics that havent participated in the divergence to get deg C/s units and to be comparable with temp_hdiff.
+
+xdiff_temp_ = dterm1_dxi_ / (ds_avg.dz * ds_avg.dy)
+ydiff_temp_ = dterm2_deta_ / (ds_avg.dz * ds_avg.dx)
+
+
+# Summing xdiff and ydiff to get hdiff_temp
+hdiff_temp_ = xdiff_temp_ + ydiff_temp_
 
 ```
 <br>
 <br>
 
-![horizontal diff](images/ohb_images/horizontal_diffusion.png)
+![horizontal diff](images/ohb_images/comparing_hdiff.png)
 
-*Fig: Horizontal diffusion vertically integrated.*
+*Fig: Rate of change comparisson between the temp_hdiff from diagnostic and my manual calculation shown here.*
 
-John Wilkin words about the efficiency of calculating by hand the horizontal mixing:
->Diffusive fluxes through a cell side multiplied by elemental area (I think that's what you are asking, in analogy to advective flux u*temp times cell face area H_on_n) are not diagnostics we save. 
-
->The saved diffusion term is only the flux divergence. 
-See the docs at https://www.myroms.org/wiki/Horizontal_Mixing#Horizontal_Diffusion for guidance on the correct way to calculate these.
-
->I created the Huon outputs because in tidal flows there can be a very strong nonlinear triple correlation between sea level (hence Hz) and phase of tide (u) and tracer. Using average zeta times the conventional u*temp average didn't balance. 
-But for diffusive fluxes, the Hz/mn term multiplies only dC/dxi (e.g. Eqn. 11 at the link above) and you don't have that complicated nonlinearity of a correlated velocity. You should be able to get a nice balance. 
+John Wilkin words about the topic can be found on the [ROMS forum](https://www.myroms.org/forum/viewtopic.php?p=25568#p25568) and in private messages:
 
 
-
+![horizontal diff](images/ohb_images/wilkin_PM_01.png)
 
 <br>
 <br>
+
+![horizontal diff](images/ohb_images/wilkin_PM_02.png)
+
+<br>
+<br>
+
+![horizontal diff](images/ohb_images/wilkin_PM_03.png)
+
+<br>
+<br>
+
+![horizontal diff](images/ohb_images/wilkin_PM_04.png)
+
+
+
 
 ## Good practices when analysing the data
 - Masking land with NaN, to make sure it won't influentiate when integrating.
